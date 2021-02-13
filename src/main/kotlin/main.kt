@@ -1,15 +1,19 @@
 import com.github.mustachejava.DefaultMustacheFactory
 import com.google.common.collect.ImmutableList
 import com.google.common.io.Resources
+import java.io.StringWriter
 import java.nio.charset.StandardCharsets
-import java.sql.DriverManager
 import java.sql.Connection
+import java.sql.DriverManager
+import java.time.Instant
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.util.Locale
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.Options
 import spark.kotlin.Http
 import spark.kotlin.ignite
-import java.io.StringWriter
-import java.time.Instant
+import java.time.ZoneId
 
 val PORT = 8080
 val FLAG_PROFILE_PATH = "firefox_profile_path"
@@ -73,7 +77,7 @@ fun readBookmarks(connection: Connection): ImmutableList<Bookmark> {
                       id = it.getInt("id"),
                       title = it.getString("title"),
                       url = it.getString("url"),
-                      dateAdded = Instant.ofEpochSecond(it.getLong("dateAdded")).toString()
+                      dateAdded = formatTimestamp(it.getLong("dateAdded")),
                   )
               )
           }
@@ -84,3 +88,13 @@ fun readBookmarks(connection: Connection): ImmutableList<Bookmark> {
     }
     return bookmarks.build()
 }
+
+val formatter = DateTimeFormatter
+    .ofLocalizedDateTime(FormatStyle.SHORT)
+    .withLocale(Locale.US)
+    .withZone(ZoneId.systemDefault())
+fun formatTimestamp(timestamp: Long): String {
+    val instant = Instant.ofEpochSecond(timestamp)
+    return formatter.format(instant)
+}
+
