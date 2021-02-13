@@ -20,6 +20,7 @@ dependencies {
     implementation("com.google.template:soy:2021-02-01")
     implementation("com.google.guava:guava:18.0")
     implementation("commons-cli:commons-cli:1.4")
+    runtimeOnly("org.xerial:sqlite-jdbc:jar:3.34.0")
 }
 
 tasks.test {
