@@ -19,6 +19,7 @@ dependencies {
     implementation("com.sparkjava:spark-kotlin:1.0.0-alpha")
     implementation("com.google.template:soy:2021-02-01")
     implementation("com.google.guava:guava:18.0")
+    implementation("commons-cli:commons-cli:1.4")
 }
 
 tasks.test {
