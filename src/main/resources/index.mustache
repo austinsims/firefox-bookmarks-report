@@ -1,0 +1,45 @@
+<html>
+<head>
+    <title>Bookmarks</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<h1>Bookmarks</h1>
+<table>
+    <thead>
+    <tr>
+        <th class="column id">
+            id
+        </th>
+        <th class="column title">
+            title
+        </th>
+        <th class="column url">
+            url
+        </th>
+        <th class="column date-added">
+            dateAdded
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    {{#bookmarks}}
+        <tr>
+            <td class="column id">
+                {{id}}
+            </td>
+            <td class="column title">
+                {{title}}
+            </td>
+            <td class="column url">
+                {{url}}
+            </td>
+            <td class="column date-added">
+                {{dateAdded}}
+            </td>
+        </tr>
+    {{/bookmarks}}
+    </tbody>
+</table>
+</body>
+</html>

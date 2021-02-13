@@ -1,0 +1,26 @@
+.column {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.id {
+  width: 5%;
+}
+
+.title {
+  width: 45%;
+}
+
+.url {
+  width: 35%;
+}
+
+.date-added {
+  width: 10%;
+}
+
+table {
+  table-layout: fixed;
+  width: 100%;
+}

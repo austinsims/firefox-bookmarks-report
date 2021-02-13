@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="com.github.spullara.mustache.java:compiler:0.9.7" type="repository">
+    <properties maven-id="com.github.spullara.mustache.java:compiler:0.9.7" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/github/spullara/mustache/java/compiler/0.9.7/compiler-0.9.7.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

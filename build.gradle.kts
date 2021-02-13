@@ -13,9 +13,9 @@ repositories {
 }
 
 dependencies {
+    implementation("com.github.spullara.mustache.java:compiler:0.9.7")
     implementation("com.google.guava:guava:18.0")
     implementation("com.google.guava:guava:30.1-jre")
-    implementation("com.google.template:soy:2021-02-01")
     implementation("com.sparkjava:spark-kotlin:1.0.0-alpha")
     implementation("commons-cli:commons-cli:1.4")
     runtimeOnly("org.xerial:sqlite-jdbc:jar:3.34.0")

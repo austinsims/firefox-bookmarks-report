@@ -1,49 +1,86 @@
+import com.github.mustachejava.DefaultMustacheFactory
 import com.google.common.collect.ImmutableList
-import com.google.common.collect.ImmutableMap
 import com.google.common.io.Resources
-import com.google.template.soy.SoyFileSet
 import java.nio.charset.StandardCharsets
 import java.sql.DriverManager
+import java.sql.Connection
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.Options
 import spark.kotlin.Http
 import spark.kotlin.ignite
+import java.io.StringWriter
+import java.time.Instant
 
 val PORT = 8080
 val FLAG_PROFILE_PATH = "firefox_profile_path"
 val QUERY_INDEX = Resources.toString(Resources.getResource("index.sql"), StandardCharsets.UTF_8)
 
 fun main(args: Array<String>) {
+    try {
+      run(args)
+    } catch (e: Exception) {
+        println(e.message)
+        e.printStackTrace()
+    }
+}
+
+fun run(args: Array<String>) {
     // Parse arguments
     val options = Options()
-    options.addOption("p", FLAG_PROFILE_PATH, true /* hasArg */, "Path to Firefox profile directory")
-    val parser = DefaultParser()
-    val commandLine = parser.parse(options, args)
+    options.addOption(
+        "p",
+        FLAG_PROFILE_PATH,
+        true /* hasArg */,
+        "Path to Firefox profile directory")
+    val commandLine = DefaultParser().parse(options, args)
     val profilePath = commandLine.getOptionValue(FLAG_PROFILE_PATH)
-    println("profilePath: $profilePath")
 
     // Connect to database
     val connection = DriverManager.getConnection("jdbc:sqlite:$profilePath/places.sqlite")
 
-    // Configure Soy
-    val fileSet = SoyFileSet.builder().add(Resources.getResource("index.soy")).build()
-    val tofu = fileSet.compileToTofu()
-
     // Configure HTTP
     val http: Http = ignite()
     http.port(PORT)
+    http.staticFiles.location("/public")
+
+    // Index action
     http.get("/") {
-        val urls = ImmutableList.builder<String>()
-        connection.createStatement().executeQuery(QUERY_INDEX).use {
-            while(it.next()) urls.add(it.getString("url"))
+        val template = DefaultMustacheFactory().compile("index.mustache")
+        val writer = StringWriter()
+        val bookmarks = readBookmarks(connection)
+        val params = object {
+            val bookmarks = bookmarks
         }
-        tofu
-            .newRenderer("name.austinsims.bookmarks.index.render")
-            .setData(ImmutableMap.builder<String, Any>()
-                .put("urls", urls.build())
-                .build())
-            .renderHtml()
-            .toString()
+        template.execute(writer, params)
     }
+
     println("Running at http://localhost:$PORT")
+}
+
+data class Bookmark(
+    val id: Int,
+    val title: String,
+    val url: String,
+    val dateAdded: String)
+
+fun readBookmarks(connection: Connection): ImmutableList<Bookmark> {
+    val bookmarks = ImmutableList.builder<Bookmark>()
+    try {
+      connection.createStatement().executeQuery(QUERY_INDEX).use {
+          while (it.next()) {
+              bookmarks.add(
+                  Bookmark(
+                      id = it.getInt("id"),
+                      title = it.getString("title"),
+                      url = it.getString("url"),
+                      dateAdded = Instant.ofEpochSecond(it.getLong("dateAdded")).toString()
+                  )
+              )
+          }
+      }
+    } catch (e: Exception) {
+        e.printStackTrace()
+        throw RuntimeException(e)
+    }
+    return bookmarks.build()
 }
