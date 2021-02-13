@@ -13,14 +13,15 @@ repositories {
 }
 
 dependencies {
-    testImplementation(kotlin("test-junit5"))
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.0")
-    implementation("com.sparkjava:spark-kotlin:1.0.0-alpha")
-    implementation("com.google.template:soy:2021-02-01")
     implementation("com.google.guava:guava:18.0")
+    implementation("com.google.guava:guava:30.1-jre")
+    implementation("com.google.template:soy:2021-02-01")
+    implementation("com.sparkjava:spark-kotlin:1.0.0-alpha")
     implementation("commons-cli:commons-cli:1.4")
     runtimeOnly("org.xerial:sqlite-jdbc:jar:3.34.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
+    testImplementation(kotlin("test-junit5"))
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.0")
 }
 
 tasks.test {

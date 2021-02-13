@@ -1,14 +1,17 @@
+import com.google.common.collect.ImmutableList
+import com.google.common.collect.ImmutableMap
 import com.google.common.io.Resources
 import com.google.template.soy.SoyFileSet
+import java.nio.charset.StandardCharsets
 import java.sql.DriverManager
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.Options
 import spark.kotlin.Http
 import spark.kotlin.ignite
-import java.nio.charset.StandardCharsets
 
 val PORT = 8080
 val FLAG_PROFILE_PATH = "firefox_profile_path"
+val QUERY_INDEX = Resources.toString(Resources.getResource("index.sql"), StandardCharsets.UTF_8)
 
 fun main(args: Array<String>) {
     // Parse arguments
@@ -21,15 +24,6 @@ fun main(args: Array<String>) {
 
     // Connect to database
     val connection = DriverManager.getConnection("jdbc:sqlite:$profilePath/places.sqlite")
-    val query =
-        Resources.toString(
-            Resources.getResource("index.sql"),
-            StandardCharsets.UTF_8)
-    connection.createStatement().executeQuery(query).use {
-        while(it.next()) {
-            println(it.getString("url"))
-        }
-    }
 
     // Configure Soy
     val fileSet = SoyFileSet.builder().add(Resources.getResource("index.soy")).build()
@@ -39,7 +33,17 @@ fun main(args: Array<String>) {
     val http: Http = ignite()
     http.port(PORT)
     http.get("/") {
-        tofu.newRenderer("name.austinsims.bookmarks.index.render").renderHtml().toString()
+        val urls = ImmutableList.builder<String>()
+        connection.createStatement().executeQuery(QUERY_INDEX).use {
+            while(it.next()) urls.add(it.getString("url"))
+        }
+        tofu
+            .newRenderer("name.austinsims.bookmarks.index.render")
+            .setData(ImmutableMap.builder<String, Any>()
+                .put("urls", urls.build())
+                .build())
+            .renderHtml()
+            .toString()
     }
     println("Running at http://localhost:$PORT")
 }

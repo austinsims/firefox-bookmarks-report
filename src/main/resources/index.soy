@@ -1,13 +1,19 @@
 {namespace name.austinsims.bookmarks.index}
 
 {template .render}
+  {@param urls: list<string>}
+
   <html>
     <head>
       <title>Bookmarks</title>
     </head>
     <body>
       <h1>Bookmarks</h1>
-      <p>Hello, html</p>
+      <ol>
+        {for $url in $urls}
+          <li>{$url}</li>
+        {/for}
+      </ol>
     </body>
   </html>
 {/template}
