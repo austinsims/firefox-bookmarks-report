@@ -8,16 +8,19 @@
 <table>
     <thead>
     <tr>
-        <th class="column id">
+        <th class="clip id">
             id
         </th>
-        <th class="column title">
+        <th class="clip title">
             title
         </th>
-        <th class="column url">
+        <th class="wrap tags">
+            tags
+        </th>
+        <th class="clip url">
             url
         </th>
-        <th class="column date-added">
+        <th class="clip date-added">
             dateAdded
         </th>
     </tr>
@@ -25,20 +28,27 @@
     <tbody>
     {{#bookmarks}}
         <tr>
-            <td class="column id">
+            <td class="clip id">
                 {{id}}
             </td>
-            <td class="column title">
+            <td class="clip title">
                 {{title}}
             </td>
-            <td class="column url">
+            <td class="wrap tags">
+                <ul>
+                {{#tags}}
+                    <li>{{.}}</li>
+                {{/tags}}
+                </ul>
+            </td>
+            <td class="clip url">
                 <a href="{{url}}"
                    target="_blank"
                    rel="noopener noreferrer">
                   {{url}}
                 </a>
             </td>
-            <td class="column date-added">
+            <td class="clip date-added">
                 {{dateAdded}}
             </td>
         </tr>

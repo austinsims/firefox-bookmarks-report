@@ -1,5 +1,8 @@
 import com.github.mustachejava.DefaultMustacheFactory
 import com.google.common.collect.ImmutableList
+import com.google.common.collect.ImmutableSet
+import com.google.common.collect.ImmutableSet.toImmutableSet
+import com.google.common.collect.ImmutableSetMultimap
 import com.google.common.io.Resources
 import java.io.StringWriter
 import java.nio.charset.StandardCharsets
@@ -15,6 +18,7 @@ import java.time.format.FormatStyle
 import java.util.Locale
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.Options
+import spark.Spark
 import spark.kotlin.Http
 import spark.kotlin.ignite
 
@@ -22,16 +26,21 @@ val PORT = 8080
 val FLAG_PROFILE_PATH = "firefox_profile_path"
 val QUERY_INDEX = Resources.toString(Resources.getResource("index.sql"), StandardCharsets.UTF_8)
 
-fun main(args: Array<String>) {
-    try {
-      run(args)
-    } catch (e: Exception) {
-        println(e.message)
-        e.printStackTrace()
-    }
-}
+data class Bookmark(
+    val id: Int,
+    val title: String,
+    val url: String,
+    val dateAdded: String,
+    val tags: ImmutableSet<String>)
 
-fun run(args: Array<String>) {
+data class Row(
+    val id: Int,
+    val title: String,
+    val url: String,
+    val dateAdded: String,
+    val parentTitle: String)
+
+fun main(args: Array<String>) {
     // Parse arguments
     val options = Options()
     options.addOption(
@@ -52,12 +61,16 @@ fun run(args: Array<String>) {
     val http: Http = ignite()
     http.port(PORT)
     http.staticFiles.location("/public")
+    Spark.exception(Exception::class.java) { e, _, _ ->
+        e.printStackTrace()
+    }
 
     // Index action
     http.get("/") {
         val template = DefaultMustacheFactory().compile("index.mustache")
         val writer = StringWriter()
-        val bookmarks = readBookmarks(connection)
+        val rows = readRows(connection)
+        val bookmarks = rowsToBookmarks(rows)
         val params = object {
             val bookmarks = bookmarks
         }
@@ -67,30 +80,34 @@ fun run(args: Array<String>) {
     println("Running at http://localhost:$PORT")
 }
 
-data class Bookmark(
-    val id: Int,
-    val title: String,
-    val url: String,
-    val dateAdded: String)
+fun readRows(connection: Connection): ImmutableSetMultimap<String, Row> {
+    val rowsByUrlBuilder = ImmutableSetMultimap.builder<String, Row>()
+    connection.createStatement().executeQuery(QUERY_INDEX).use {
+        while (it.next()) {
+            val url = it.getString("url")
+            val id = it.getInt("id")
+            val title = it.getString("title") ?: ""
+            val dateAdded = formatTimestamp(it.getLong("dateAdded"))
+            val parentTitle = it.getString("parentTitle")
+            rowsByUrlBuilder.put(url, Row(id, title, url, dateAdded, parentTitle))
+        }
+    }
+    return rowsByUrlBuilder.build()
+}
 
-fun readBookmarks(connection: Connection): ImmutableList<Bookmark> {
+fun rowsToBookmarks(rowsByUrl: ImmutableSetMultimap<String, Row>): ImmutableList<Bookmark> {
     val bookmarks = ImmutableList.builder<Bookmark>()
-    try {
-      connection.createStatement().executeQuery(QUERY_INDEX).use {
-          while (it.next()) {
-              bookmarks.add(
-                  Bookmark(
-                      id = it.getInt("id"),
-                      title = it.getString("title"),
-                      url = it.getString("url"),
-                      dateAdded = formatTimestamp(it.getLong("dateAdded")),
-                  )
-              )
-          }
-      }
-    } catch (e: Exception) {
-        e.printStackTrace()
-        throw RuntimeException(e)
+    for (url in rowsByUrl.keySet()) {
+        val rows = rowsByUrl.get(url)
+        val id = rows.stream().findAny().get().id
+        val title = rows.stream()
+            .map { it.title }
+            .filter { !it.isEmpty() }
+            .findFirst()
+            .orElse("")
+        val dateAdded = rows.stream().findAny().get().dateAdded
+        val tags = rows.stream().map { it.parentTitle }.collect(toImmutableSet())
+        bookmarks.add(Bookmark(id, title, url, dateAdded, tags))
     }
     return bookmarks.build()
 }
