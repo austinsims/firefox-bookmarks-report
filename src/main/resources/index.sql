@@ -10,6 +10,7 @@ from
   join moz_places pl on bk_child.fk = pl.id
 where
   url like 'http%'
-  and parentTitle like ?
+  and bk_child.title like ?
+  and bk_parent.title like ?
 order by
   bk_child.dateAdded desc

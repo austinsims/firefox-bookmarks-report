@@ -4,9 +4,17 @@
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<a href="/" class="link-heading">
+
+<a href="/" class="link-plain">
   <h1>Bookmarks</h1>
 </a>
+
+<form action="/" method="GET">
+    <input name="tag" value="{{tagParam}}" type="hidden" />
+    <input name="title" type="text" value="{{titleParam}}" placeholder="Search title" />
+    <a class="link-plain" href="/?tag={{tagParam}}">&times;</a>
+</form>
+
 <table>
     <thead>
     <tr>
@@ -39,7 +47,7 @@
             <td class="col-wrap col-tags">
                 <div class="container-tags">
                   {{#tags}}
-                    <a href="/?tag={{.}}" class="link-tag">
+                    <a href="/?title={{titleParam}}&tag={{.}}" class="link-tag link-plain">
                       {{.}}
                     </a>
                   {{/tags}}

@@ -36,14 +36,12 @@
 .link-tag {
   background-color: rgba(0, 0, 0, 0.1);
   border-radius: 2px;
-  color: initial;
   font-family: sans-serif;
   margin: 2px;
   padding: 4px;
-  text-decoration: none;
 }
 
-.link-heading {
+.link-plain {
   color: initial;
   text-decoration: none;
 }
