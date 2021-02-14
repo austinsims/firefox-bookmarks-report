@@ -69,7 +69,7 @@ fun main(args: Array<String>) {
     http.get("/") {
         val template = DefaultMustacheFactory().compile("index.mustache")
         val writer = StringWriter()
-        val rows = readRows(connection)
+        val rows = readRows(connection, request.queryParams("tag") ?: "")
         val bookmarks = rowsToBookmarks(rows)
         val params = object {
             val bookmarks = bookmarks
@@ -80,9 +80,11 @@ fun main(args: Array<String>) {
     println("Running at http://localhost:$PORT")
 }
 
-fun readRows(connection: Connection): ImmutableSetMultimap<String, Row> {
+fun readRows(connection: Connection, tag: String): ImmutableSetMultimap<String, Row> {
     val rowsByUrlBuilder = ImmutableSetMultimap.builder<String, Row>()
-    connection.createStatement().executeQuery(QUERY_INDEX).use {
+    val statement = connection.prepareStatement(QUERY_INDEX)
+    statement.setString(1, "%$tag%")
+    statement.executeQuery().use {
         while (it.next()) {
             val url = it.getString("url")
             val id = it.getInt("id")

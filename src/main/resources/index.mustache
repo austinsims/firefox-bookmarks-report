@@ -37,7 +37,11 @@
             <td class="wrap tags">
                 <ul>
                 {{#tags}}
-                    <li>{{.}}</li>
+                    <li>
+                        <a href="/?tag={{.}}">
+                          {{.}}
+                        </a>
+                    </li>
                 {{/tags}}
                 </ul>
             </td>
