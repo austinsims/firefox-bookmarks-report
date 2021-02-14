@@ -1,31 +1,51 @@
-.clip {
+.col-clip {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.wrap {
+.col-wrap {
   white-space: wrap;
 }
 
-.id {
+.col-id {
   width: 5%;
 }
 
-.title {
+.col-title {
   width: 30%;
 }
 
-.tags {
+.col-tags {
   width: 15%;
 }
 
-.url {
+.col-url {
   width: 35%;
 }
 
-.date-added {
+.col-date-added {
   width: 10%;
+}
+
+.container-tags {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.link-tag {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+  color: initial;
+  font-family: sans-serif;
+  margin: 2px;
+  padding: 4px;
+  text-decoration: none;
+}
+
+.link-heading {
+  color: initial;
+  text-decoration: none;
 }
 
 table {
@@ -45,4 +65,8 @@ th, td {
 ul {
   margin: 0;
   padding: 0 0 0 16px;
+}
+
+h1, h2, h3, h4, h5, h6, h7 {
+  font-family: sans-serif;
 }

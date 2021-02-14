@@ -4,23 +4,25 @@
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<h1>Bookmarks</h1>
+<a href="/" class="link-heading">
+  <h1>Bookmarks</h1>
+</a>
 <table>
     <thead>
     <tr>
-        <th class="clip id">
+        <th class="col-clip col-id">
             id
         </th>
-        <th class="clip title">
+        <th class="col-clip col-title">
             title
         </th>
-        <th class="wrap tags">
+        <th class="col-wrap col-tags">
             tags
         </th>
-        <th class="clip url">
+        <th class="col-clip col-url">
             url
         </th>
-        <th class="clip date-added">
+        <th class="col-clip col-date-added">
             dateAdded
         </th>
     </tr>
@@ -28,31 +30,29 @@
     <tbody>
     {{#bookmarks}}
         <tr>
-            <td class="clip id">
+            <td class="col-clip col-id">
                 {{id}}
             </td>
-            <td class="clip title">
+            <td class="col-clip col-title">
                 {{title}}
             </td>
-            <td class="wrap tags">
-                <ul>
-                {{#tags}}
-                    <li>
-                        <a href="/?tag={{.}}">
-                          {{.}}
-                        </a>
-                    </li>
-                {{/tags}}
-                </ul>
+            <td class="col-wrap col-tags">
+                <div class="container-tags">
+                  {{#tags}}
+                    <a href="/?tag={{.}}" class="link-tag">
+                      {{.}}
+                    </a>
+                  {{/tags}}
+                </div>
             </td>
-            <td class="clip url">
+            <td class="col-clip col-url">
                 <a href="{{url}}"
                    target="_blank"
                    rel="noopener noreferrer">
                   {{url}}
                 </a>
             </td>
-            <td class="clip date-added">
+            <td class="col-clip col-date-added">
                 {{dateAdded}}
             </td>
         </tr>
